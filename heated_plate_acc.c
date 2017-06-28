@@ -2,6 +2,7 @@
 # include <stdio.h>
 # include <math.h>
 # include <omp.h>
+
 int main ( int argc, char *argv[] );
 
 /******************************************************************************/
@@ -16,7 +17,7 @@ int main ( int argc, char *argv[] )
 
   Discussion:
 
- :   This code solves the steady state heat equation on a rectangular region.
+    This code solves the steady state heat equation on a rectangular region.
 
     The sequential version of this program needs approximately
     18/epsilon iterations to complete.
@@ -132,9 +133,7 @@ int main ( int argc, char *argv[] )
 */
   mean = 0.0;
 
-//#pragma omp parallel shared ( w ) private ( i, j )
-#pragma acc data copy(w), copyin(M, N), create(i, j)
-#pragma acc kernels
+#pragma acc parallel copy(w)
   {
 #pragma acc loop
     for ( i = 1; i < M - 1; i++ )
@@ -160,6 +159,7 @@ int main ( int argc, char *argv[] )
   Average the boundary values, to come up with a reasonable
   initial value for the interior.
 */
+#pragma acc wait
 #pragma acc loop reduction ( + : mean )
     for ( i = 1; i < M - 1; i++ )
     {
@@ -172,7 +172,6 @@ int main ( int argc, char *argv[] )
     }
   }
 /*
-  OpenMP note:
   You cannot normalize MEAN inside the parallel region.  It
   only gets its correct value once you leave the parallel region.
   So we interrupt the parallel region, set MEAN, and go back in.
@@ -183,10 +182,7 @@ int main ( int argc, char *argv[] )
 /*
   Initialize the interior solution to the mean value.
 */
-//#pragma omp parallel shared ( mean, w ) private ( i, j )
-#pragma acc kernels copyin(M, N, mean), copy(w), create(i, j)
-  {
-#pragma acc loop
+    #pragma acc parallel loop copy(w) copyin(mean)
     for ( i = 1; i < M - 1; i++ )
     {
       for ( j = 1; j < N - 1; j++ )
@@ -194,7 +190,7 @@ int main ( int argc, char *argv[] )
         w[i][j] = mean;
       }
     }
-  }
+
 /*
   iterate until the  new solution W differs from the old solution U
   by no more than EPSILON.
@@ -207,13 +203,11 @@ int main ( int argc, char *argv[] )
   wtime = omp_get_wtime ( );
 
   diff = epsilon;
-
+#pragma acc data copy(w, iterations) create(diff, my_diff, u) copyin(iterations_print)
+{
   while ( epsilon <= diff )
   {
-//# pragma omp parallel shared ( u, w ) private ( i, j )
-#pragma acc data copy(u, w), create(i, j), copyin(M, N)
-#pragma acc kernels
-    {
+
 /*
   Save the old solution in U.
 */
@@ -237,39 +231,26 @@ int main ( int argc, char *argv[] )
           w[i][j] = ( u[i-1][j] + u[i+1][j] + u[i][j-1] + u[i][j+1] ) / 4.0;
         }
       }
-    }
-/*
-  C and C++ cannot compute a maximum as a reduction operation.
 
-  Therefore, we define a private variable MY_DIFF for each thread.
-  Once they have all computed their values, we use a CRITICAL section
-  to update DIFF.
-*/
     diff = 0.0;
-//# pragma omp parallel shared ( diff, u, w ) private ( i, j, my_diff )
-#pragma acc data copyin(M, N, u, w), create(i, j), copy(my_diff, diff)
-#pragma acc kernels reduction(min: diff)
-    {
+
       my_diff = 0.0;
-# pragma acc loop
+
       for ( i = 1; i < M - 1; i++ )
       {
+        #pragma acc loop
         for ( j = 1; j < N - 1; j++ )
         {
           if ( my_diff < fabs ( w[i][j] - u[i][j] ) )
           {
-
             my_diff = fabs ( w[i][j] - u[i][j] );
           }
         }
       }
 
-        if ( diff < my_diff )
-        {
+
           diff = my_diff;
 
-      }
-    }
 
     iterations++;
     if ( iterations == iterations_print )
@@ -278,6 +259,7 @@ int main ( int argc, char *argv[] )
       iterations_print = 2 * iterations_print;
     }
   }
+}
   wtime = omp_get_wtime ( ) - wtime;
 
   printf ( "\n" );
