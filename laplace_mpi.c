@@ -1,38 +1,16 @@
 /****************************************************************
- * Laplace MPI Template C Version                                         
- *                                                               
- * T is initially 0.0                                            
- * Boundaries are as follows                                     
- *                                                               
- *                T                      4 sub-grids            
- *   0  +-------------------+  0    +-------------------+       
- *      |                   |       |                   |           
- *      |                   |       |-------------------|         
- *      |                   |       |                   |      
- *   T  |                   |  T    |-------------------|             
- *      |                   |       |                   |     
- *      |                   |       |-------------------|            
- *      |                   |       |                   |   
- *   0  +-------------------+ 100   +-------------------+         
- *      0        T       100                                    
- *                                                                 
- * Each PE only has a local subgrid.
- * Each PE works on a sub grid and then sends         
- * its boundaries to neighbors.
- *                                                                 
- *  John Urbanic, PSC 2014
- *
+ * Laplace MPI                                     
  *******************************************************************/
 
-#
-include < stdlib.h > #include < stdio.h > #include < math.h > #include < sys / time.h > #include < mpi.h >
+# include < stdlib.h > #include < stdio.h > #include < math.h > #include < sys / time.h > #include < mpi.h >
 
   #define COLUMNS 1000# define ROWS_GLOBAL 1000 // this is a "global" row count
   # define NPES 4 // number of processors
   # define ROWS(ROWS_GLOBAL / NPES) // number of real local rows
 
 // communication tags
-# define DOWN 100# define UP 101
+# define DOWN 100
+# define UP 101
 
 # define MAX_TEMP_ERROR 0.01
 
