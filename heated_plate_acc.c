@@ -211,7 +211,7 @@ int main ( int argc, char *argv[] )
 /*
   Save the old solution in U.
 */
-# pragma acc loop
+# pragma parallel acc loop collapse(2)
       for ( i = 0; i < M; i++ )
       {
         for ( j = 0; j < N; j++ )
@@ -223,7 +223,7 @@ int main ( int argc, char *argv[] )
   Determine the new estimate of the solution at the interior points.
   The new solution W is the average of north, south, east and west neighbors.
 */
-# pragma acc loop
+# pragma parallel acc loop collapse(2)
       for ( i = 1; i < M - 1; i++ )
       {
         for ( j = 1; j < N - 1; j++ )
@@ -235,10 +235,9 @@ int main ( int argc, char *argv[] )
     diff = 0.0;
 
       my_diff = 0.0;
-
+#pragma acc parallel loop collapse(2) reduction(max: my_diff)
       for ( i = 1; i < M - 1; i++ )
       {
-        #pragma acc loop
         for ( j = 1; j < N - 1; j++ )
         {
           if ( my_diff < fabs ( w[i][j] - u[i][j] ) )
