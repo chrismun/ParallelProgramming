@@ -132,8 +132,8 @@ int main ( int argc, char *argv[] )
   Set the boundary values, which don't change.
 */
   mean = 0.0;
-
-#pragma acc parallel copy(w)
+#pragma acc enter data create(w[:M][:N], mean)
+#pragma acc kernels
   {
 #pragma acc loop
     for ( i = 1; i < M - 1; i++ )
@@ -159,7 +159,6 @@ int main ( int argc, char *argv[] )
   Average the boundary values, to come up with a reasonable
   initial value for the interior.
 */
-#pragma acc wait
 #pragma acc loop reduction ( + : mean )
     for ( i = 1; i < M - 1; i++ )
     {
@@ -169,7 +168,8 @@ int main ( int argc, char *argv[] )
     for ( j = 0; j < N; j++ )
     {
       mean = mean + w[M-1][j] + w[0][j];
-    }
+
+    #pragma acc update host(mean)
   }
 /*
   You cannot normalize MEAN inside the parallel region.  It
@@ -182,7 +182,8 @@ int main ( int argc, char *argv[] )
 /*
   Initialize the interior solution to the mean value.
 */
-    #pragma acc parallel loop copy(w) copyin(mean)
+    #pragma acc update device(mean)
+    #pragma acc kernels loop collapse(2)
     for ( i = 1; i < M - 1; i++ )
     {
       for ( j = 1; j < N - 1; j++ )
@@ -190,7 +191,7 @@ int main ( int argc, char *argv[] )
         w[i][j] = mean;
       }
     }
-
+#pragma acc update host(w[:M][:N])
 /*
   iterate until the  new solution W differs from the old solution U
   by no more than EPSILON.
@@ -203,7 +204,8 @@ int main ( int argc, char *argv[] )
   wtime = omp_get_wtime ( );
 
   diff = epsilon;
-#pragma acc data copy(w, iterations) create(diff, my_diff, u) copyin(iterations_print)
+#pragma acc enter data create(u[:M][:N],my_diff)
+#pragma acc data pcopy(w, iterations, u, diff, my_diff)
 {
   while ( epsilon <= diff )
   {
@@ -211,7 +213,7 @@ int main ( int argc, char *argv[] )
 /*
   Save the old solution in U.
 */
-# pragma parallel acc loop collapse(2)
+      # pragma acc kernels loop collapse(2)
       for ( i = 0; i < M; i++ )
       {
         for ( j = 0; j < N; j++ )
@@ -223,7 +225,7 @@ int main ( int argc, char *argv[] )
   Determine the new estimate of the solution at the interior points.
   The new solution W is the average of north, south, east and west neighbors.
 */
-# pragma parallel acc loop collapse(2)
+      # pragma acc kernels loop collapse(2)
       for ( i = 1; i < M - 1; i++ )
       {
         for ( j = 1; j < N - 1; j++ )
@@ -232,12 +234,13 @@ int main ( int argc, char *argv[] )
         }
       }
 
-    diff = 0.0;
-
+      diff = 0.0;
       my_diff = 0.0;
-#pragma acc parallel loop collapse(2) reduction(max: my_diff)
+      #pragma acc update device(my_diff)
+      #pragma acc kernels loop
       for ( i = 1; i < M - 1; i++ )
       {
+        #pragma acc loop reduction(max:my_diff)
         for ( j = 1; j < N - 1; j++ )
         {
           if ( my_diff < fabs ( w[i][j] - u[i][j] ) )
@@ -246,10 +249,8 @@ int main ( int argc, char *argv[] )
           }
         }
       }
-
-
-          diff = my_diff;
-
+      #pragma acc update host(my_diff)
+      diff = my_diff;
 
     iterations++;
     if ( iterations == iterations_print )
