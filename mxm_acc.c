@@ -64,8 +64,8 @@ int main ( void )
 
   wtime = omp_get_wtime ( );
 
-//# pragma omp parallel shared ( a, b, c, n, pi, s ) private ( angle, i, j, k )
-#pragma acc parallel loop collapse(2) copyout(a)
+#pragma acc data enter(a[:500][:500], b[:500][:500], c[:500][:500], pi, i, n, s, angle)
+#pragma acc kernels loop collapse(2)
   for ( i = 0; i < n; i++ )
   {
     for ( j = 0; j < n; j++ )
@@ -77,7 +77,7 @@ int main ( void )
 /*
   Loop 2: Copy A into B.
 */
-  #pragma acc parallel loop collapse(2) copyout(b) copyin(a)
+#pragma acc kernels loop collapse 2
   for ( i = 0; i < n; i++ )
   {
     for ( j = 0; j < n; j++ )
@@ -88,7 +88,7 @@ int main ( void )
 /*
   Loop 3: Compute C = A * B.
 */
-# pragma acc parallel loop collapse(2) copyout(c) copyin(a, b)
+#pragma acc kernels loop collapse(3)
 for ( i = 0; i < n; i++ )
 {
   for ( j = 0; j < n; j++ )
@@ -99,7 +99,7 @@ for ( i = 0; i < n; i++ )
     }
   }
 }
-
+#pragma acc data exit delete(a[:500][:500], b[:500][:500], pi, i, n, s, angle)
 
   wtime = omp_get_wtime ( ) - wtime;
   printf ( "  Elapsed seconds = %g\n", wtime );
@@ -107,6 +107,7 @@ for ( i = 0; i < n; i++ )
 /*
   Terminate.
 */
+#pragma acc data exit delete(c[:500][:500])
   printf ( "\n" );
   printf ( "MXM_OPENMP:\n" );
   printf ( "  Normal end of execution.\n" );

@@ -1,5 +1,5 @@
 /****************************************************************
- * Laplace MPI                                     
+ * Laplace MPI
  *******************************************************************/
 
 # include < stdlib.h > #include < stdio.h > #include < math.h > #include < sys / time.h > #include < mpi.h >
@@ -33,9 +33,7 @@ int main(int argc, char * argv[]) {
   int npes; // number of PEs
   int my_PE_num; // my PE number
   double dt_global = 100; // delta t across all PEs
-  MPI_Status status; // status returned by MPI calls
-
-  // the usual MPI startup routines
+  MPI_Status status;
   MPI_Init( & argc, & argv);
   MPI_Comm_rank(MPI_COMM_WORLD, & my_PE_num);
   MPI_Comm_size(MPI_COMM_WORLD, & npes);
@@ -48,7 +46,7 @@ int main(int argc, char * argv[]) {
     MPI_Finalize();
     exit(1);
   }
-  // PE 0 asks for input
+  //input
   if (my_PE_num == 0) {
     printf("Maximum iterations [100-4000]?\n");
     scanf("%d", & max_iterations);
@@ -63,7 +61,7 @@ int main(int argc, char * argv[]) {
 
   while (dt_global > MAX_TEMP_ERROR && iteration <= max_iterations) {
 
-    // main calculation: average my four neighbors
+    // main calculation: average four neighbors
     for (i = 1; i <= ROWS; i++) {
       for (j = 1; j <= COLUMNS; j++) {
         Temperature[i][j] = 0.25 * (Temperature_last[i + 1][j] + Temperature_last[i - 1][j] +
@@ -100,8 +98,6 @@ int main(int argc, char * argv[]) {
       }
     }
 
-    // find global dt
-
     MPI_Reduce( & dt, & dt_global, 1, MPI_FLOAT, MPI_MAX, 0, MPI_COMM_WORLD);
     MPI_Bcast( & dt_global, 1, MPI_FLOAT, 0, MPI_COMM_WORLD);
 
@@ -114,10 +110,7 @@ int main(int argc, char * argv[]) {
 
     iteration++;
   }
-
-  // Slightly more accurate timing and cleaner output 
   MPI_Barrier(MPI_COMM_WORLD);
-
   // PE 0 finish timing and output values
   if (my_PE_num == 0) {
     gettimeofday( & stop_time, NULL);
@@ -168,9 +161,8 @@ void initialize(int npes, int my_PE_num) {
 void track_progress(int iteration) {
 
   int i;
-
   printf("---------- Iteration number: %d ------------\n", iteration);
-
+  
   // output global coordinates so user doesn't have to understand decomposition
   for (i = 5; i >= 0; i--) {
     printf("[%d,%d]: %5.2f  ", ROWS_GLOBAL - i, COLUMNS - i, Temperature[ROWS - i][COLUMNS - i]);
