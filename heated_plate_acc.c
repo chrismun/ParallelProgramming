@@ -233,7 +233,7 @@ int main ( int argc, char *argv[] )
           w[i][j] = ( u[i-1][j] + u[i+1][j] + u[i][j-1] + u[i][j+1] ) / 4.0;
         }
       }
-
+// Find max diff
       diff = 0.0;
       my_diff = 0.0;
       #pragma acc update device(my_diff)
@@ -255,6 +255,8 @@ int main ( int argc, char *argv[] )
     iterations++;
     if ( iterations == iterations_print )
     {
+      
+      //print progress
       printf ( "  %8d  %f\n", iterations, diff );
       iterations_print = 2 * iterations_print;
     }
@@ -265,6 +267,7 @@ int main ( int argc, char *argv[] )
   printf ( "\n" );
   printf ( "  %8d  %f\n", iterations, diff );
   printf ( "\n" );
+    //execution time
   printf ( "  Error tolerance achieved.\n" );
   printf ( "  Wallclock time = %f\n", wtime );
 /*
