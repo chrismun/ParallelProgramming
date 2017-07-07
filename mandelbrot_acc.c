@@ -96,10 +96,9 @@ int main ( void )
      Carry out the iteration for each pixel, determining COUNT.
      */
 
-        #pragma acc parallel loop private(x1, x2, y1, y2) copyout(x1,x2,y1,y2,r,g,b)
+        #pragma acc kernels loop collapse(2) private(x1, x2, y1, y2) copyout(x1,x2,y1,y2,r,g,b)
         for ( i = 0; i < m; i++ )
         {
-          #pragma acc loop
             for ( j = 0; j < n; j++ )
             {
                 x = ( ( double ) (     j - 1 ) * x_max
