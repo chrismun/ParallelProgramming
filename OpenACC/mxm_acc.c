@@ -64,7 +64,7 @@ int main ( void )
 
   wtime = omp_get_wtime ( );
 
-#pragma acc data enter(a[:500][:500], b[:500][:500], c[:500][:500], pi, i, n, s, angle)
+#pragma acc data enter(a[:500][:500], b[:500][:500], c[:500][:500], pi, n, s, angle)
 #pragma acc kernels loop collapse(2)
   for ( i = 0; i < n; i++ )
   {
@@ -77,7 +77,7 @@ int main ( void )
 /*
   Loop 2: Copy A into B.
 */
-#pragma acc kernels loop collapse 2
+#pragma acc parallel loop collapse(2)
   for ( i = 0; i < n; i++ )
   {
     for ( j = 0; j < n; j++ )
