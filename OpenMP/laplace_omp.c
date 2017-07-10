@@ -16,7 +16,6 @@
  *   0  +-------------------+ 100
  *      0         T        100
  *
- *  John Urbanic, PSC 2014
  *
  ************************************************/
 
@@ -29,7 +28,7 @@
 #define COLUMNS    1000
 #define ROWS       1000
 
-// largest permitted change in temp (This value takes about 3400 steps)
+// largest permitted change in temp 
 #define MAX_TEMP_ERROR 0.01
 
 double Temperature[ROWS+2][COLUMNS+2];      // temperature grid
