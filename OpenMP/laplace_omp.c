@@ -16,7 +16,7 @@
  *   0  +-------------------+ 100
  *      0         T        100
  *
- *  John Urbanic, PSC 2014
+ *
  *
  ************************************************/
 
@@ -29,7 +29,7 @@
 #define COLUMNS    1000
 #define ROWS       1000
 
-// largest permitted change in temp (This value takes about 3400 steps)
+// largest permitted change in temp
 #define MAX_TEMP_ERROR 0.01
 
 double Temperature[ROWS+2][COLUMNS+2];      // temperature grid
@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
                                             Temperature_last[i][j+1] + Temperature_last[i][j-1]);
             }
         }
-        
+
         dt = 0.0; // reset largest temperature change
 
         // copy grid to old grid for next iteration and find latest dt
@@ -114,7 +114,7 @@ void initialize(){
         Temperature_last[i][0] = 0.0;
         Temperature_last[i][COLUMNS+1] = (100.0/ROWS)*i;
     }
-    
+
     // set top to 0 and bottom to linear increase
     for(j = 0; j <= COLUMNS+1; j++) {
         Temperature_last[0][j] = 0.0;
