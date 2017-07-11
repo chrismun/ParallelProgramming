@@ -17,7 +17,6 @@
  *      0         T        100
  *
  *
- *
  ************************************************/
 
 #include <stdlib.h>
@@ -29,7 +28,6 @@
 #define COLUMNS    1000
 #define ROWS       1000
 
-// largest permitted change in temp
 #define MAX_TEMP_ERROR 0.01
 
 double Temperature[ROWS+2][COLUMNS+2];      // temperature grid
