@@ -28,6 +28,10 @@ int main ( void )
   Author:
 
     John Burkardt
+    
+    
+  John Burkardt wrote this mxm code with OpenMP directives, and I took the code and converted it to OpenACC to test
+  the efficiency and run this code on a GPU
 */
 {
   double a[500][500];
