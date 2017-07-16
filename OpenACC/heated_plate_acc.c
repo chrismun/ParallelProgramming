@@ -81,6 +81,8 @@ int main ( int argc, char *argv[] )
 
     Original C version by Michael Quinn.
     This C version by John Burkardt.
+    
+    I took John Burkardt's OpenMP version of heated plate and converted it to OpenACC
 
   Reference:
 
