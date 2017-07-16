@@ -1,8 +1,15 @@
 /****************************************************************
- * Laplace MPI
+ Laplace MPI
+ 
+ Original Author: John Urbanic, PSC
+ I added MPI code to allow the laplace code to run across multiple nodes 
  *******************************************************************/
 
-# include < stdlib.h > #include < stdio.h > #include < math.h > #include < sys / time.h > #include < mpi.h >
+#include < stdlib.h > 
+#include < stdio.h > 
+#include < math.h > 
+#include < sys / time.h > 
+#include < mpi.h >
 
   #define COLUMNS 1000# define ROWS_GLOBAL 1000 // this is a "global" row count
   # define NPES 4 // number of processors
