@@ -16,7 +16,8 @@
  *   0  +-------------------+ 100
  *      0         T        100
  *
- * 
+ * Author of orignal program: John Urbanic PSC
+ * I added OpenACC directives to make the program run in parallel
  *
  ************************************************/
 
