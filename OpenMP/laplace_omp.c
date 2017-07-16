@@ -1,5 +1,5 @@
 /*************************************************
- * Laplace OpenMP C Version
+ * Laplace OpenMP 
  *
  * Temperature is initially 0.0
  * Boundaries are as follows:
@@ -15,7 +15,8 @@
  *      |                   |
  *   0  +-------------------+ 100
  *      0         T        100
- *
+ * Author of original code: John Urbanic, PSC
+ * I added OpenMP directives to improve performance
  *
  ************************************************/
 
