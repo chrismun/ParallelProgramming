@@ -34,6 +34,8 @@ int main ( void )
  Author:
 
  John Burkardt
+ 
+ I took John Burkardt's OpenMP code and converted it to OpenACC
 
  Local Parameters:
 
