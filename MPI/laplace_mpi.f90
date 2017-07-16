@@ -16,7 +16,8 @@
 ! Each Processor works on a sub grid and then sends its
 ! boundaries to neighbours
 !
-!  
+! Original Author: John Urbanic, PSC
+! I added MPI code to allow the laplace code to run across multiple nodes 
 !
 !*************************************************
 program mpi
