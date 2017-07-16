@@ -16,7 +16,8 @@
 !   0  +-------------------+ 100
 !      0         T        100
 !
-!  
+! Author of serial code: John Urbanic, PSC
+! I added OpenACC directives to improve performance
 !
 !*************************************************
 program serial
