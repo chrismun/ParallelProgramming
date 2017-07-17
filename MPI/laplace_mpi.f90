@@ -51,7 +51,7 @@ program mpi
       call MPI_Comm_size(MPI_COMM_WORLD, npes, ierr)
       call MPI_Comm_rank(MPI_COMM_WORLD, mype, ierr)
 
-      !It is nice to verify that proper number of PEs are running
+      !verify that proper number of PEs are running
       if ( npes /= total_pes ) then
          if( mype == 0 ) then
             print *,'This example is hardwired to run only on ', total_pes, ' PEs'
