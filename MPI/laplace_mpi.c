@@ -11,9 +11,9 @@
 #include < sys / time.h > 
 #include < mpi.h >
 
-  #define COLUMNS 1000# define ROWS_GLOBAL 1000 // this is a "global" row count
-  # define NPES 4 // number of processors
-  # define ROWS(ROWS_GLOBAL / NPES) // number of real local rows
+# define COLUMNS 1000# define ROWS_GLOBAL 1000 // this is a "global" row count
+# define NPES 4 // number of processors
+# define ROWS(ROWS_GLOBAL / NPES) // number of real local rows
 
 // communication tags
 # define DOWN 100
